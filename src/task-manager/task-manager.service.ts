@@ -1,27 +1,33 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import {Repository} from "typeorm";
 import { Task } from './entities/task.entity';
 
 @Injectable()
 export class TaskManagerService {
-  private tasks: Task[] = [
-    {
-      id: 'A-1',
-      title: 'learn GIT',
-      isCompleted: true
-    },
-    {
-      id: 'A-2',
-      title: 'learn ES',
-      isCompleted: false
-    },
-    {
-      id: 'A-3',
-      title: 'learn PHP',
-      isCompleted: true
-    },
-  ];
 
-  findAll() {
-    return this.tasks;
+  constructor(
+    @InjectRepository(Task)
+    private tasksRepository: Repository<Task>,
+  ) {}
+
+  getAll(): Promise<Task[]> {
+    return this.tasksRepository.find();
+  }
+
+  findById(id): Promise<Task> {
+    return this.tasksRepository.findOneOrFail({ id });
+  }
+
+  save(task: Task) {
+    this.tasksRepository.save(task);
+  }
+
+  add(task: Task) {
+    this.tasksRepository.insert(task);
+  }
+
+  remove(id: number) {
+    this.tasksRepository.delete(id);
   }
 }
